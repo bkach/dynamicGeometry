@@ -7,7 +7,7 @@ var camera = new THREE.PerspectiveCamera(45,
 camera.position.z = 70;
 scene.add(camera);
 
-var axisHelper = new THREE.AxisHelper( 5 );
+var axisHelper = new THREE.AxisHelper( 30 );
 scene.add( axisHelper );
 
 // Controls
@@ -18,6 +18,7 @@ var renderer = new THREE.WebGLRenderer({
   antialias: true
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0xfffffff);
 document.body.appendChild(renderer.domElement);
 
 MAX_POINTS = 10000;
@@ -28,21 +29,17 @@ for(i=0; i < MAX_POINTS; i++){
   geo.vertices.push(startingPoint.clone());
   geo.faces.push(startingFace.clone());
 }
-// bottom left 0
-geo.vertices[0] = new THREE.Vector3(-5,-5,0);
-// bottom right 1
-geo.vertices[1] = new THREE.Vector3(5,-5,0);
-// upper left 2
-geo.vertices[2] = new THREE.Vector3(-5,5,0);
-// upper right 3
-geo.vertices[3] = new THREE.Vector3(5,5,0);
 
+//bottom
+//First row
 
-geo.faces[0] = new THREE.Face3(2,0,3);
-geo.faces[1] = new THREE.Face3(0,1,3);
-
-geo.computeFaceNormals();
-geo.computeVertexNormals();
+geo.vertices[0] = new THREE.Vector3( -30,  0,  0 );
+geo.vertices[1] = new THREE.Vector3( -20,  0,  0 );
+geo.vertices[2] = new THREE.Vector3( -10,  0,  0 );
+geo.vertices[3] = new THREE.Vector3(   0,  0,  0  );
+geo.vertices[4] = new THREE.Vector3(  10,  0,  0 );
+geo.vertices[5] = new THREE.Vector3(  20,  0,  0 );
+geo.vertices[6] = new THREE.Vector3(  30,  0,  0 );
 
 var mesh = new THREE.Mesh(
     geo,
@@ -51,33 +48,50 @@ var mesh = new THREE.Mesh(
 
 scene.add(mesh);
 
+window.addEventListener("click",onClick);
+
+var numLevels = 1;
+var boxesPerRow = 6;
+var boxSize = 10;
+var leftBoundary = -1 * (boxSize * boxesPerRow / 2);
+function onClick(e){
+  console.log("click");
+  // Create points
+  for(var i=0; i < boxesPerRow; i++){
+    mesh.geometry.vertices[(boxesPerRow+1) * numLevels + i] = new THREE.Vector3(
+        leftBoundary + (boxSize*i),
+        numLevels*boxSize,
+        0);
+  }
+  // Create faces
+  for(var i=0; i < boxesPerRow; i++){
+    mesh.geometry.faces[2*boxesPerRow*numLevels+(2*i)] = new THREE.Face3(
+        (numLevels*(boxesPerRow+1)) + i,
+        ((numLevels-1) * (boxesPerRow+1) + i),
+        (numLevels*(boxesPerRow+1)) + i + 1
+        );
+    mesh.geometry.faces[2*boxesPerRow*numLevels+(2*i)+1] = new THREE.Face3(
+        ((numLevels-1) * (boxesPerRow+1) + i), //0
+        ((numLevels-1) * (boxesPerRow+1) + i + 1), //1
+        (numLevels*(boxesPerRow+1)) + i + 1 //8
+      );
+  }
+  mesh.geometry.computeFaceNormals();
+  mesh.geometry.computeVertexNormals();
+  mesh.geometry.verticesNeedUpdate = true;
+  mesh.geometry.elementsNeedUpdate = true;
+  numLevels++;
+}
+
 // Render and animate
-var i = 2;
 var render = function(){
-
-    // upper left 4 and on
-    mesh.geometry.vertices[2*i] = ( new THREE.Vector3( -5, 10 + i, -i*3 ) );
-    // upper left 5 and on
-    mesh.geometry.vertices[(2*i)+1] = ( new THREE.Vector3( 5, 10 + i, -i*3 ) );
-
-    mesh.geometry.faces[(i-1)*2] = ( new THREE.Face3(2+(i),0+(i),3+(i)) );
-    mesh.geometry.faces[((i-1)*2)+1] = ( new THREE.Face3(0+(i),1+(i),3+(i)) );
-
-    geo.computeFaceNormals();
-    //geo.computeVertexNormals();
-
-    i+=2;
-    console.log(((i-1)*2)+1);
-
-    mesh.geometry.verticesNeedUpdate = true;
-    mesh.geometry.elementsNeedUpdate = true;
     controls.update();
     renderer.render(scene,camera);
 }
 
 var animate = function(){
-    setTimeout(animate,1000/1);
-    //requestAnimationFrame( animate );
+    //setTimeout(animate,1000/1);
+    requestAnimationFrame( animate );
     render();
 }
 animate();
