@@ -115,7 +115,7 @@ var animate = function(){
 }
 
 var geoTimeout = function(){
-  setTimeout(geoTimeout,1000/60);
+  setTimeout(geoTimeout,1000/20);
   augmentGeometry();
 }
 
