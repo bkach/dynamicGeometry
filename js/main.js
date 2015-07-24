@@ -4,7 +4,7 @@ var scene = new THREE.Scene();
 // Camera
 var camera = new THREE.PerspectiveCamera(45, 
     window.innerWidth / window.innerHeight, 1, 10000);
-camera.position.set(0,0,50);
+camera.position.set(0,400,400);
 scene.add(camera);
 
 // Controls
