@@ -1,8 +1,10 @@
-Dynamic Geometries
+Dynamic Geometry
 ==================
 
-A quick example of how to create on-the-fly dynamic geometries.
+A quick example of how to create an on-the-fly dynamic geometry.
 
-The key is in how the faces are drawn on the vertices - as the order is extremely important!
+![screenshot](images/screenshot.png)
+
+The key is in how the faces are drawn on the veracities - as the order is extremely important!
 
 [Quick Demo](http://bkach.github.io/dynamicGeometry)
