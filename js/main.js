@@ -9,7 +9,6 @@ scene.add(camera);
 
 // Controls
 var controls = new THREE.TrackballControls(camera);
-console.log(controls);
 
 var axisHelper = new THREE.AxisHelper( 30 );
 scene.add( axisHelper );
@@ -24,8 +23,11 @@ renderer.setClearColor(0xfffffff);
 document.body.appendChild(renderer.domElement);
 window.addEventListener( 'resize', onWindowResize, false );
 
-ROWS = 10;
-NUM_POINTS_AND_FACES = 1000;
+ROWS = 100;
+NUM_POINTS_AND_FACES = 5000;
+SIZE = 10;
+MAXHEIGHT = 40
+
 console.log(NUM_POINTS_AND_FACES/(ROWS * 2), "rows will be produced.")
 
 var geo = new THREE.Geometry();
@@ -40,21 +42,18 @@ var mesh = new THREE.Mesh(
     );
 
 mesh.frustumCulled = false;
-
 scene.add(mesh);
 
 var currentRow = 0;
-var size = 10;
-var maxHeight = 40
 
-mesh.position.x -= ROWS*size/2;
-mesh.position.y -= maxHeight;
+mesh.position.x -= ROWS*SIZE/2;
+mesh.position.y -= MAXHEIGHT;
 
 var augmentGeometry = function(){
  if(currentRow == 0){
     // create initial points - c for column
     for(var c=0; c < ROWS+1; c++){
-      geo.vertices[c] = new THREE.Vector3(c * size, 0, 0);
+      geo.vertices[c] = new THREE.Vector3(c * SIZE, 0, 0);
     }
     currentRow++;
   }
@@ -63,16 +62,16 @@ var augmentGeometry = function(){
     for(var c=0; c < ROWS+1; c++){
       var initialIndex = (ROWS+1) * currentRow + c;
       mesh.geometry.vertices[initialIndex] = new THREE.Vector3(
-          (size*c),
-          Math.random() * maxHeight,
-          currentRow*size);
+          (SIZE*c),
+          Math.random() * MAXHEIGHT,
+          -currentRow*SIZE);
     }
     // Create faces
     for(var c=0; c < ROWS; c++){
-      var upperLeft = (currentRow*(ROWS+1)) + c + 1; //8
-      var upperRight = (currentRow*(ROWS+1)) + c; // 7
-      var bottomLeft = ((currentRow-1) * (ROWS+1) + c + 1); //1
-      var bottomRight = ((currentRow-1) * (ROWS+1) + c); // 0
+      var bottomLeft = (currentRow*(ROWS+1)) + c + 1; //8
+      var bottomRight = (currentRow*(ROWS+1)) + c; // 7
+      var upperLeft = ((currentRow-1) * (ROWS+1) + c + 1); //1
+      var upperRight = ((currentRow-1) * (ROWS+1) + c); // 0
 
       mesh.geometry.faces[(2*ROWS*(currentRow-1)+(2*c))%NUM_POINTS_AND_FACES] = new THREE.Face3(
           upperLeft,
@@ -92,7 +91,7 @@ var augmentGeometry = function(){
     // mesh.geometry.computeVertexNormals();
     currentRow++;
 
-    mesh.position.z -= 10;
+    mesh.position.z += 10;
   } 
 }
 
@@ -116,7 +115,7 @@ var animate = function(){
 }
 
 var geoTimeout = function(){
-  setTimeout(geoTimeout,1000/10);
+  setTimeout(geoTimeout,1000/60);
   augmentGeometry();
 }
 
